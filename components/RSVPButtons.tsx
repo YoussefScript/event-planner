@@ -2,21 +2,32 @@
 
 import { toggleRSVP } from "@/lib/event-actions";
 import { RSVPStatus } from "@/lib/models";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface RSVPButtonsProps {
   eventId: string;
   currentRSVP?: RSVPStatus;
+  isAuthenticated?: boolean;
+  isFull?: boolean;
 }
 
 export default function RSVPButtons({
   eventId,
   currentRSVP,
+  isAuthenticated = false,
+  isFull = false,
 }: RSVPButtonsProps) {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const isGoing = currentRSVP === "GOING";
 
   async function handleToggle() {
+    if (!isAuthenticated) {
+      router.push("/login");
+      return;
+    }
+
     setIsLoading(true);
     try {
       const result = await toggleRSVP(eventId);
@@ -28,6 +39,26 @@ export default function RSVPButtons({
     } finally {
       setIsLoading(false);
     }
+  }
+
+  // Event is full and user is not already attending
+  if (isFull) {
+    return (
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-foreground">
+          RSVP to this event
+        </h3>
+        <div className="flex items-center gap-3 px-5 py-3 rounded-lg border border-red-500/30 bg-red-500/10 w-fit">
+          <span className="text-red-400 text-lg">⚠️</span>
+          <div>
+            <p className="text-red-400 font-semibold text-sm">Event Full</p>
+            <p className="text-red-400/70 text-xs">
+              This event has reached maximum capacity
+            </p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -56,6 +87,11 @@ export default function RSVPButtons({
             "Attend Event"
           )}
         </button>
+        {!isAuthenticated && !isGoing && (
+          <p className="text-muted text-xs mt-2">
+            Sign in required to RSVP
+          </p>
+        )}
       </div>
     </div>
   );

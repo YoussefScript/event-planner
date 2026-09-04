@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import EventActions from "@/components/EventActions";
 import RSVPButtons from "@/components/RSVPButtons";
-import { Event, RSVPStatus } from "@/lib/models";
+import { RSVPStatus } from "@/lib/models";
 import { format } from "date-fns";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -34,10 +34,6 @@ export default async function EventPage({
     notFound();
   }
 
-  if (!event.isPublic && event.userId !== session?.user?.id) {
-    notFound();
-  }
-
   let currentRSVP: RSVPStatus | undefined;
   if (session?.user?.id) {
     const userRSVP = event.rsvps.find(
@@ -48,12 +44,8 @@ export default async function EventPage({
 
   const isOwner = session?.user?.id === event.userId;
   const isPast = new Date(event.date) < new Date();
-
   const goingRSVPs = event.rsvps.filter((rsvp) => rsvp.status == "GOING");
-  const maybeRSVPs = event.rsvps.filter((rsvp) => rsvp.status == "MAYBE");
-  const notGoingRSVPs = event.rsvps.filter(
-    (rsvp) => rsvp.status == "NOT_GOING"
-  );
+  const isFull = !!(event.maxAttendees && goingRSVPs.length >= event.maxAttendees);
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -163,19 +155,18 @@ export default async function EventPage({
             )}
           </div>
 
-          {!isPast && event.isPublic && session && (
-            <RSVPButtons eventId={event.id} currentRSVP={currentRSVP} />
+          {!isPast && (
+            <RSVPButtons
+              eventId={event.id}
+              currentRSVP={currentRSVP}
+              isAuthenticated={!!session}
+              isFull={isFull && !currentRSVP}
+            />
           )}
 
           {isPast && (
             <div className="text-center p-4">
               <p className="text-muted">This event has already passed</p>
-            </div>
-          )}
-
-          {!event.isPublic && (
-            <div className="text-center p-4">
-              <p className="text-muted">This is a private event</p>
             </div>
           )}
         </div>

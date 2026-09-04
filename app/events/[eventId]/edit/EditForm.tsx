@@ -114,45 +114,22 @@ export default function EditForm({ event }: EditFormProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label
-            htmlFor="maxAttendees"
-            className="block text-sm text-foreground font-medium mb-2"
-          >
-            Maximum Attendees
-          </label>
-          <input
-            type="number"
-            id="maxAttendees"
-            name="maxAttendees"
-            defaultValue={event.maxAttendees ?? ""}
-            min="1"
-            className="input-field"
-            placeholder="Leave empty for unlimited"
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="isPublic"
-            className="block text-sm text-foreground font-medium mb-2"
-          >
-            Event Visibility
-          </label>
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="isPublic"
-              name="isPublic"
-              defaultChecked={event.isPublic}
-              className="h-4 w-4 text-primary focus:ring-primary border-slate-600 rounded bg-slate-800"
-            />
-            <label htmlFor="isPublic" className="text-foreground ml-2 block text-sm">
-              Make this event public
-            </label>
-          </div>
-        </div>
+      <div>
+        <label
+          htmlFor="maxAttendees"
+          className="block text-sm text-foreground font-medium mb-2"
+        >
+          Maximum Attendees
+        </label>
+        <input
+          type="number"
+          id="maxAttendees"
+          name="maxAttendees"
+          defaultValue={event.maxAttendees ?? ""}
+          min="1"
+          className="input-field"
+          placeholder="Leave empty for unlimited"
+        />
       </div>
 
       {state.error && (
