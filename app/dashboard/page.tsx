@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { Event, EventRSVP } from "@/lib/models";
+import { prisma } from "@/lib/prisma";
 import { format } from "date-fns";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -11,36 +11,28 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
-  const userRSVPsRes = await fetch(
-    `${baseUrl}/api/dashboard/rsvps`,
-    {
-      next: { tags: ["rsvps"] },
-    }
-  );
-
-  const userRSVPs: EventRSVP[] = userRSVPsRes.ok
-    ? await userRSVPsRes.json()
-    : [];
-
-  const userEventsRes = await fetch(
-    `${baseUrl}/api/dashboard/events`,
-    {
-      next: { tags: ["events"] },
-    }
-  );
-
-  const userEvents: Event[] = userEventsRes.ok
-    ? await userEventsRes.json()
-    : [];
+  const [userEvents, userRSVPs] = await Promise.all([
+    prisma.event.findMany({
+      where: { userId: session.user.id },
+      include: { _count: { select: { rsvps: true } } },
+      orderBy: { date: "desc" },
+    }),
+    prisma.rSVP.findMany({
+      where: { userId: session.user.id },
+      include: {
+        event: {
+          include: {
+            user: { select: { name: true, email: true } },
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    }),
+  ]);
 
   const now = new Date();
-  const upcomingEvents = userEvents.filter(
-    (event: Event) => new Date(event.date) >= now
-  );
-  const pastEvents = userEvents.filter(
-    (event: Event) => new Date(event.date) < now
-  );
+  const upcomingEvents = userEvents.filter((event) => new Date(event.date) >= now);
+  const pastEvents = userEvents.filter((event) => new Date(event.date) < now);
 
   return (
     <div className="space-y-8">

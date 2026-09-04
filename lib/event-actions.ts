@@ -213,7 +213,8 @@ export async function toggleRSVP(eventId: string) {
   }
 }
 
-export async function rsvpToEvent(eventId: string, status: RSVPStatus) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function rsvpToEvent(eventId: string, _status?: RSVPStatus) {
   try {
     const session = await auth();
     if (!session?.user?.id) {

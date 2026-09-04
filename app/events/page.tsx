@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import EventsList from "@/components/EventsList";
+import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
 export default async function EventsPage({
@@ -10,16 +11,27 @@ export default async function EventsPage({
   const session = await auth();
   const sp = await searchParams;
 
-  const params = new URLSearchParams();
-  if (sp.search) params.set("search", sp.search);
-  if (sp.filter) params.set("filter", sp.filter);
+  const where: any = {}; // eslint-disable-line
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
-  const eventsResponse = await fetch(
-    `${baseUrl}/api/events?${params.toString()}`,
-    { next: { tags: ["events"] } }
-  );
-  const events = eventsResponse.ok ? await eventsResponse.json() : [];
+  if (sp.search) {
+    where.OR = [
+      { title: { contains: sp.search, mode: "insensitive" } },
+      { description: { contains: sp.search, mode: "insensitive" } },
+      { location: { contains: sp.search, mode: "insensitive" } },
+    ];
+  }
+
+  if (sp.filter === "upcoming") {
+    where.date = { gte: new Date() };
+  } else if (sp.filter === "past") {
+    where.date = { lt: new Date() };
+  }
+
+  const events = await prisma.event.findMany({
+    where,
+    include: { user: { select: { name: true, email: true } } },
+    orderBy: { date: "asc" },
+  });
 
   return (
     <div className="space-y-8">
