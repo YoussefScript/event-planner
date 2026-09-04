@@ -18,12 +18,13 @@ export interface Event {
 }
 
 export interface EventRSVP {
-  userId: string;
+  userId?: string;
   status: RSVPStatus;
-  user: {
-    name: string;
-  };
   event?: Event;
+  user: {
+    name: string | null;
+    email?: string | null;
+  };
 }
 
 export type RSVPStatus = "GOING" | "NOT_GOING" | "MAYBE";
