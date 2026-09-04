@@ -151,6 +151,71 @@ export async function deleteEvent(eventId: string) {
   }
 }
 
+export async function toggleRSVP(eventId: string) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return { success: false, error: "Not authenticated" };
+    }
+
+    const existingEvent = await prisma.event.findUnique({
+      where: { id: eventId },
+      include: {
+        _count: {
+          select: { rsvps: { where: { status: "GOING" } } },
+        },
+      },
+    });
+
+    if (!existingEvent) {
+      return { success: false, error: "Event not found" };
+    }
+
+    const existingRSVP = await prisma.rSVP.findUnique({
+      where: {
+        userId_eventId: {
+          userId: session.user.id,
+          eventId,
+        },
+      },
+    });
+
+    if (existingRSVP) {
+      await prisma.rSVP.delete({
+        where: {
+          userId_eventId: {
+            userId: session.user.id,
+            eventId,
+          },
+        },
+      });
+    } else {
+      if (
+        existingEvent.maxAttendees &&
+        existingEvent._count.rsvps >= existingEvent.maxAttendees
+      ) {
+        return { success: false, error: "Event has reached maximum capacity" };
+      }
+
+      await prisma.rSVP.create({
+        data: {
+          userId: session.user.id,
+          eventId,
+          status: "GOING",
+        },
+      });
+    }
+
+    revalidateTag("events");
+    revalidateTag(`event-${eventId}`);
+    revalidateTag("rsvps");
+    return { success: true };
+  } catch (err) {
+    console.error(err);
+    return { success: false, error: "Failed to update RSVP" };
+  }
+}
+
 export async function rsvpToEvent(eventId: string, status: RSVPStatus) {
   try {
     const session = await auth();
@@ -166,10 +231,6 @@ export async function rsvpToEvent(eventId: string, status: RSVPStatus) {
       return { success: false, error: "Event not found" };
     }
 
-    if (!existingEvent.isPublic) {
-      return { success: false, error: "Event is not public" };
-    }
-
     const existingRSVP = await prisma.rSVP.findUnique({
       where: {
         userId_eventId: {
@@ -180,27 +241,27 @@ export async function rsvpToEvent(eventId: string, status: RSVPStatus) {
     });
 
     if (existingRSVP) {
-      await prisma.rSVP.update({
+      await prisma.rSVP.delete({
         where: {
           userId_eventId: {
             userId: session.user.id,
             eventId,
           },
         },
-        data: { status },
       });
     } else {
       await prisma.rSVP.create({
         data: {
           userId: session.user.id,
           eventId,
-          status,
+          status: "GOING",
         },
       });
     }
 
     revalidateTag("events");
     revalidateTag(`event-${eventId}`);
+    revalidateTag("rsvps");
     return { success: true };
   } catch (err) {
     console.error(err);

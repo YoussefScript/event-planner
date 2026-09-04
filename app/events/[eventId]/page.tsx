@@ -181,57 +181,20 @@ export default async function EventPage({
         </div>
       </div>
 
-      {event.isPublic && event.rsvps.length > 0 && (
+      {goingRSVPs.length > 0 && (
         <div className="card p-8">
-          <h2 className="text-2xl font-bold text-foreground mb-6">Attendees</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {goingRSVPs.length > 0 && (
-              <div>
-                <h3 className="text-lg font-semibold text-green-400 mb-3">
-                  Going ({goingRSVPs.length})
-                </h3>
-                <div className="space-y-2">
-                  {goingRSVPs.map((rsvp, key) => (
-                    <div key={key} className="flex items-center">
-                      <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
-                      <span className="text-foreground">{rsvp.user.name}</span>
-                    </div>
-                  ))}
+          <h2 className="text-2xl font-bold text-foreground mb-6">
+            Attendees ({goingRSVPs.length})
+          </h2>
+          <div className="grid md:grid-cols-3 gap-4">
+            {goingRSVPs.map((rsvp, key) => (
+              <div key={key} className="flex items-center gap-3 p-3 rounded-lg bg-slate-800/50 border border-slate-700/50">
+                <div className="w-8 h-8 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center font-bold text-sm">
+                  {(rsvp.user.name || rsvp.user.email || "U")[0].toUpperCase()}
                 </div>
+                <span className="text-foreground font-medium">{rsvp.user.name || rsvp.user.email}</span>
               </div>
-            )}
-
-            {maybeRSVPs.length > 0 && (
-              <div>
-                <h3 className="text-lg font-semibold text-yellow-400 mb-3">
-                  Maybe ({maybeRSVPs.length})
-                </h3>
-                <div className="space-y-2">
-                  {maybeRSVPs.map((rsvp, key) => (
-                    <div key={key} className="flex items-center">
-                      <div className="w-2 h-2 bg-yellow-400 rounded-full mr-3"></div>
-                      <span className="text-foreground">{rsvp.user.name}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {notGoingRSVPs.length > 0 && (
-              <div>
-                <h3 className="text-lg font-semibold text-red-400 mb-3">
-                  Not Going ({notGoingRSVPs.length})
-                </h3>
-                <div className="space-y-2">
-                  {notGoingRSVPs.map((rsvp, key) => (
-                    <div key={key} className="flex items-center">
-                      <div className="w-2 h-2 bg-red-400 rounded-full mr-3"></div>
-                      <span className="text-foreground">{rsvp.user.name}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            ))}
           </div>
         </div>
       )}

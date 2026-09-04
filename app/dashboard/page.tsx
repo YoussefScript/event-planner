@@ -171,16 +171,8 @@ export default async function DashboardPage() {
                 <h3 className="text-lg font-semibold text-foreground mb-2">
                   {rsvp.event?.title}
                 </h3>
-                <span
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    rsvp.status === "GOING"
-                      ? "bg-green-600/20 text-green-400"
-                      : rsvp.status === "MAYBE"
-                      ? "bg-yellow-600/20 text-yellow-400"
-                      : "bg-red-600/20 text-red-400"
-                  }`}
-                >
-                  {rsvp.status}
+                <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-green-600/20 text-green-400">
+                  ✓ Attending
                 </span>
                 <p className="text-muted mb-4 mt-2">
                   {rsvp.event?.description}

@@ -1,8 +1,7 @@
 "use client";
 
-import { rsvpToEvent } from "@/lib/event-actions";
+import { toggleRSVP } from "@/lib/event-actions";
 import { RSVPStatus } from "@/lib/models";
-import { RVSPStatus } from "@prisma/client";
 import { useState } from "react";
 
 interface RSVPButtonsProps {
@@ -15,44 +14,14 @@ export default function RSVPButtons({
   currentRSVP,
 }: RSVPButtonsProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const isGoing = currentRSVP === "GOING";
 
-  function getButtonClass(status: RSVPStatus) {
-    const baseClass =
-      "px-4 py-2 rounded-md font-medium transition-colors disabled:opacity-50";
-
-    const isActive = currentRSVP === status;
-
-    switch (status) {
-      case "GOING":
-        return `${baseClass} ${
-          isActive
-            ? "bg-green-600 text-white"
-            : "bg-green-600/20 text-green-400 hover:bg-green-600/30"
-        }`;
-      case "NOT_GOING":
-        return `${baseClass} ${
-          isActive
-            ? "bg-red-600 text-white"
-            : "bg-red-600/20 text-red-400 hover:bg-red-600/30"
-        }`;
-      case "MAYBE":
-        return `${baseClass} ${
-          isActive
-            ? "bg-yellow-600 text-white"
-            : "bg-yellow-600/20 text-yellow-400 hover:bg-yellow-600/30"
-        }`;
-      default:
-        return baseClass;
-    }
-  }
-
-  async function handleRSVP(status: RVSPStatus) {
+  async function handleToggle() {
     setIsLoading(true);
     try {
-      const result = await rsvpToEvent(eventId, status);
-      if (result.success) {
-      } else {
-        console.error(result.error);
+      const result = await toggleRSVP(eventId);
+      if (!result.success && result.error) {
+        alert(result.error);
       }
     } catch (err) {
       console.error(err);
@@ -66,27 +35,26 @@ export default function RSVPButtons({
       <h3 className="text-lg font-semibold text-foreground">
         RSVP to this event
       </h3>
-      <div className="flex flex-wrap gap-3">
+      <div>
         <button
           disabled={isLoading}
-          className={getButtonClass("GOING")}
-          onClick={() => handleRSVP("GOING")}
+          onClick={handleToggle}
+          className={`px-6 py-2.5 rounded-lg font-medium transition-all flex items-center gap-2 disabled:opacity-50 ${
+            isGoing
+              ? "bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-600/20"
+              : "btn-primary"
+          }`}
         >
-          Going
-        </button>
-        <button
-          disabled={isLoading}
-          className={getButtonClass("MAYBE")}
-          onClick={() => handleRSVP("MAYBE")}
-        >
-          Maybe
-        </button>
-        <button
-          disabled={isLoading}
-          className={getButtonClass("NOT_GOING")}
-          onClick={() => handleRSVP("NOT_GOING")}
-        >
-          Not Going
+          {isLoading ? (
+            "Updating..."
+          ) : isGoing ? (
+            <>
+              <span>✓ Attending</span>
+              <span className="text-xs opacity-80">(Click to Cancel)</span>
+            </>
+          ) : (
+            "Attend Event"
+          )}
         </button>
       </div>
     </div>
