@@ -31,7 +31,11 @@ export default async function EventsPage({
     where,
     include: {
       user: { select: { name: true, email: true } },
-      rsvps: true,
+      rsvps: {
+        include: {
+          user: { select: { name: true, email: true } },
+        },
+      },
       _count: { select: { rsvps: true } },
     },
     orderBy: { date: "asc" },
