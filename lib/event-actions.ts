@@ -61,6 +61,65 @@ export async function createEvent(_: any, formData: FormData) {
   }
 }
 
+// eslint-disable-next-line
+export async function updateEvent(eventId: string, _: any, formData: FormData) {
+  try {
+    const session = await auth();
+
+    if (!session?.user?.id) {
+      return { success: false, error: "Not authenticated" };
+    }
+
+    const existingEvent = await prisma.event.findUnique({
+      where: { id: eventId },
+    });
+
+    if (!existingEvent) {
+      return { success: false, error: "Event not found" };
+    }
+
+    if (existingEvent.userId !== session.user.id) {
+      return { success: false, error: "Not authorized to edit this event" };
+    }
+
+    const rawData = {
+      title: formData.get("title") ? String(formData.get("title")) : "",
+      description: formData.get("description") ? String(formData.get("description")) : "",
+      date: formData.get("date") ? String(formData.get("date")) : "",
+      location: formData.get("location") ? String(formData.get("location")) : "",
+      maxAttendees: formData.get("maxAttendees") ? String(formData.get("maxAttendees")) : null,
+      isPublic: formData.get("isPublic") ? String(formData.get("isPublic")) : null,
+    };
+
+    const validatedData = eventSchema.parse(rawData);
+
+    await prisma.event.update({
+      where: { id: eventId },
+      data: {
+        title: validatedData.title,
+        description: validatedData.description,
+        date: new Date(validatedData.date),
+        location: validatedData.location,
+        maxAttendees: validatedData.maxAttendees
+          ? Number(validatedData.maxAttendees)
+          : null,
+        isPublic: validatedData.isPublic === "on",
+      },
+    });
+
+    revalidateTag("events");
+    revalidateTag(`event-${eventId}`);
+
+    return { success: true, eventId };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return { success: false, error: error.errors[0].message };
+    }
+
+    return { success: false, error: "Failed to update event", eventId: null };
+  }
+}
+
 export async function deleteEvent(eventId: string) {
   try {
     const session = await auth();
