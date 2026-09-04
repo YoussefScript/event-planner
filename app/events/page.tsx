@@ -29,7 +29,11 @@ export default async function EventsPage({
 
   const events = await prisma.event.findMany({
     where,
-    include: { user: { select: { name: true, email: true } } },
+    include: {
+      user: { select: { name: true, email: true } },
+      rsvps: true,
+      _count: { select: { rsvps: true } },
+    },
     orderBy: { date: "asc" },
   });
 
