@@ -11,8 +11,8 @@ const eventSchema = z.object({
   description: z.string().min(1, "Description is required"),
   date: z.string().min(1, "Date is required"),
   location: z.string().min(1, "Location is required"),
-  maxAttendees: z.string().optional(),
-  isPublic: z.string().optional(),
+  maxAttendees: z.string().nullable().optional(),
+  isPublic: z.string().nullable().optional(),
 });
 
 // eslint-disable-next-line
@@ -25,12 +25,12 @@ export async function createEvent(_: any, formData: FormData) {
     }
 
     const rawData = {
-      title: formData.get("title"),
-      description: formData.get("description"),
-      date: formData.get("date"),
-      location: formData.get("location"),
-      maxAttendees: formData.get("maxAttendees"),
-      isPublic: formData.get("isPublic"),
+      title: formData.get("title") ? String(formData.get("title")) : "",
+      description: formData.get("description") ? String(formData.get("description")) : "",
+      date: formData.get("date") ? String(formData.get("date")) : "",
+      location: formData.get("location") ? String(formData.get("location")) : "",
+      maxAttendees: formData.get("maxAttendees") ? String(formData.get("maxAttendees")) : null,
+      isPublic: formData.get("isPublic") ? String(formData.get("isPublic")) : null,
     };
 
     const validatedData = eventSchema.parse(rawData);
@@ -48,6 +48,8 @@ export async function createEvent(_: any, formData: FormData) {
         userId: session.user.id,
       },
     });
+
+    revalidateTag("events");
 
     return { success: true, eventId: event.id };
   } catch (error) {
