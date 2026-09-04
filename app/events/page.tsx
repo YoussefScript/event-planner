@@ -14,8 +14,9 @@ export default async function EventsPage({
   if (sp.search) params.set("search", sp.search);
   if (sp.filter) params.set("filter", sp.filter);
 
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
   const eventsResponse = await fetch(
-    `${process.env.NEXT_PUBLIC_APP_URL}/api/events?${params.toString()}`,
+    `${baseUrl}/api/events?${params.toString()}`,
     { next: { tags: ["events"] } }
   );
   const events = eventsResponse.ok ? await eventsResponse.json() : [];

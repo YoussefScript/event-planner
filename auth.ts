@@ -9,6 +9,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     GitHub({
       clientId: process.env.GITHUB_ID!,
       clientSecret: process.env.GITHUB_SECRET!,
+      checks: ["pkce", "state"],
     }),
   ],
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
 });
+

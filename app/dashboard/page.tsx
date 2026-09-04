@@ -11,8 +11,9 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
   const userRSVPsRes = await fetch(
-    `${process.env.NEXT_PUBLIC_APP_URL}/api/dashboard/rsvps`,
+    `${baseUrl}/api/dashboard/rsvps`,
     {
       next: { tags: ["rsvps"] },
     }
@@ -23,7 +24,7 @@ export default async function DashboardPage() {
     : [];
 
   const userEventsRes = await fetch(
-    `${process.env.NEXT_PUBLIC_APP_URL}/api/dashboard/events`,
+    `${baseUrl}/api/dashboard/events`,
     {
       next: { tags: ["events"] },
     }

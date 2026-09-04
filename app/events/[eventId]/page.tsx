@@ -15,8 +15,9 @@ export default async function EventPage({
 
   const session = await auth();
 
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
   const eventResponse = await fetch(
-    `${process.env.NEXT_PUBLIC_APP_URL}/api/events/${eventId}`,
+    `${baseUrl}/api/events/${eventId}`,
     { next: { tags: [`event-${eventId}`] } }
   );
 
