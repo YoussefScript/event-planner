@@ -26,6 +26,19 @@ A modern full-stack Event Planning web application built with **Next.js 15**, **
 
 ---
 
+## 🚀 ScreenShots
+<img width="1920" height="902" alt="image" src="https://github.com/user-attachments/assets/0f957cd9-e6d5-4dd6-866f-7a7b59fc5987" />
+<img width="1894" height="906" alt="image" src="https://github.com/user-attachments/assets/86842ddc-7a10-43bd-8f3d-130307cefd05" />
+<img width="1892" height="908" alt="image" src="https://github.com/user-attachments/assets/29c2902b-c543-4aea-b62c-f12c8f3b1884" />
+<img width="1897" height="898" alt="image" src="https://github.com/user-attachments/assets/e56c6d0a-e15b-45f0-80dc-156bc718fc7c" />
+<img width="1900" height="894" alt="image" src="https://github.com/user-attachments/assets/1fff1bf5-eecd-47a0-891f-c0b229d1a1e3" />
+<img width="1920" height="901" alt="image" src="https://github.com/user-attachments/assets/fec67bb3-2bd7-4736-a6d4-0eaa1f30a10b" />
+<img width="1898" height="900" alt="image" src="https://github.com/user-attachments/assets/f068bbe7-d5e2-4aef-b569-e905ed8c8d4d" />
+<img width="1898" height="883" alt="image" src="https://github.com/user-attachments/assets/dfdb2d10-8fac-494c-8b0b-ffe4b20cdc5e" />
+
+
+
+
 ## 🚀 Getting Started
 
 ### Prerequisites
