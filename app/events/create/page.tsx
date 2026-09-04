@@ -4,6 +4,8 @@ import { createEvent } from "@/lib/event-actions";
 import { useRouter } from "next/navigation";
 import { useActionState } from "react";
 
+import { useEffect } from "react";
+
 export default function CreateEventPage() {
   const router = useRouter();
   const [state, formAction, isPending] = useActionState(createEvent, {
@@ -12,9 +14,11 @@ export default function CreateEventPage() {
     error: "",
   });
 
-  if (state.success && state.eventId) {
-    router.push(`/events/${state.eventId}`);
-  }
+  useEffect(() => {
+    if (state.success && state.eventId) {
+      router.push(`/events/${state.eventId}`);
+    }
+  }, [state.success, state.eventId, router]);
   return (
     <div className="max-w-2xl mx-auto">
       <div className="mb-8">

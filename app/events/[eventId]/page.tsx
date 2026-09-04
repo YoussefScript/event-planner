@@ -6,6 +6,8 @@ import { format } from "date-fns";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { prisma } from "@/lib/prisma";
+
 export default async function EventPage({
   params,
 }: {
@@ -15,17 +17,26 @@ export default async function EventPage({
 
   const session = await auth();
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
-  const eventResponse = await fetch(
-    `${baseUrl}/api/events/${eventId}`,
-    { next: { tags: [`event-${eventId}`] } }
-  );
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+    include: {
+      user: { select: { name: true, email: true } },
+      rsvps: {
+        include: {
+          user: { select: { name: true, email: true } },
+        },
+      },
+      _count: { select: { rsvps: true } },
+    },
+  });
 
-  if (!eventResponse.ok) {
+  if (!event) {
     notFound();
   }
 
-  const event = (await eventResponse.json()) as Event;
+  if (!event.isPublic && event.userId !== session?.user?.id) {
+    notFound();
+  }
 
   let currentRSVP: RSVPStatus | undefined;
   if (session?.user?.id) {
