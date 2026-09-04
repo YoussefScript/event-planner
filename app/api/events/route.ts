@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get("search");
     const filter = searchParams.get("filter");
 
-    const where: any = {}; // eslint-disable-line
+    const where: any = { isPublic: true }; // eslint-disable-line
 
     if (search) {
       where.OR = [
